@@ -1,0 +1,207 @@
+*************   The SQL Murder Mystery   *************
+
+
+SELECT * FROM crime_scene_report 
+         WHERE type="murder" AND  city= "SQL City" AND date=20180115;
+
+Description -
+Security footage shows that there were 2 witnesses. The first witness lives at the last house on "Northwestern Dr". The second witness, named Annabel, lives somewhere on "Franklin Ave".
+		 
+
+
+1) witness        
+
+@person   SELECT * FROM person 
+          WHERE address_street_name ='Northwestern Dr'
+          ORDER BY address_number DESC
+          LIMIT 1;
+
+id	name	        license_id	address_number	address_street_name	ssn
+14887	Morty Schapiro	118009	        4919	        Northwestern Dr 	111564949
+ 
+@interview - SELECT * FROM Interview WHERE person_id=14887;
+
+person_id	transcript
+14887      	I heard a gunshot and then saw a man run out. He had a "Get Fit Now Gym" bag. The membership number on the bag started                          with "48Z". Only gold members have those bags. The man got into a car with a plate that included "H42W".
+
+
+
+2) Witness
+
+@person  SELECT * FROM person 
+         WHERE address_street_name='Franklin Ave'
+         AND name LIKE 'Annabel%';
+
+
+id	name	        license_id	address_number	address_street_name	ssn
+16371	Annabel Miller	490173	        103	        Franklin Ave	        318771143
+
+@interview - SELECT * FROM interview WHERE person_id = 16371;
+
+person_id	transcript
+16371	        I saw the murder happen, and I recognized the killer from my gym when I was working out last week on January the 9th.
+
+
+
+3) from interview - witness 2   --
+                    a) I heard a gunshot and then saw a man run out. He had a "Get Fit Now Gym" bag. 
+                    b) The membership number on the bag started with "48Z". 
+                    c) Only gold members have those bags. 
+                    d) The man got into a car with a plate that included "H42W".
+
+
+a,b,c)  SELECT * FROM get_fit_now_member 
+                  WHERE membership_status = 'gold'
+                  AND id LIKE '48Z%';
+
+id	person_id	name	        membership_start_date	membership_status
+48Z7A	 28819	        Joe Germuska	20160305	        gold
+48Z55	 67318	        Jeremy Bowers	20160101	        gold
+
+
+d) SELECT * FROM drivers_license 
+            WHERE plate_number LIKE '%H42W%';
+		 
+id	age	height	eye_color	hair_color	gender	plate_number	car_make	car_model
+183779	21	65	blue	        blonde	        female	H42W0X   	Toyota	        Prius
+423327	30	70	brown	        brown	        male	0H42W2  	Chevrolet	Spark LS
+664760	21	71	black	        black	        male	4H42WR	        Nissan	        Altima
+
+
+
+4) Check with answer we got licence_id from  drivers_license table  check in Person table
+    
+    SELECT * FROM person 
+         WHERE license_id = 183779 OR license_id= 423327 OR license_id= 664760;
+		 
+  id	 name	         license_id   address_number	address_street_name	  ssn
+  51739	 Tushar Chandra	  664760	  312	         Phi St	                137882671
+  67318	 Jeremy Bowers	  423327	  530	         Washington Pl, Apt 3A	871539279
+  78193	 Maxine Whitely	  183779	  110	         Fisk Rd	        137882671
+
+Now we check get_fit_now_check_in database
+
+SELECT * FROM get_fit_now_check_in WHERE membership_id = '48Z55' ;  
+=> membership_id	check_in_date	check_in_time	check_out_time
+    48Z55	         20180109	 1530	         1700
+
+wow we found Jeremy Bowers in both table with  gold membership and licence_id. Now check it with solution table.
+
+
+
+5) Check your solution
+   Did you find the killer?
+
+
+          INSERT INTO solution VALUES (1, 'Jeremy Bowers');
+
+          SELECT value FROM solution;
+
+value
+Congrats, you found the murderer! But wait, there's more... If you think you're up for a challenge, try querying the interview transcript of the murderer to find the real villain behind this crime. If you feel especially confident in your SQL skills, try to complete this final step with no more than 2 queries. Use this same INSERT statement with your new suspect to check your answer.
+
+
+
+6) Find Master mind behind murder
+
+    SELECT * FROM interview 
+         WHERE person_id = 67318;
+   
+
+   person_id	transcript
+    67318	I was hired by a woman with a lot of money. 
+                I don't know her name but I know she's around 5'5" (65") or 5'7" (67").
+                She has red hair and she drives a Tesla Model S. 
+                I know that she attended the SQL Symphony Concert 3 times in December 2017.
+
+7) using transcript check with income, driver_license  DB
+
+    SELECT * FROM drivers_license 
+         WHERE gender = 'female'
+		 AND hair_color = 'red'
+		 AND car_make = 'Tesla' 
+		 AND car_model = 'Model S';
+
+   SELECT * FROM person WHERE license_id=  202298;      SELECT * FROM person WHERE license_id= 291182 ;       SELECT * FROM person WHERE license_id= 918773  ; 
+
+     p_Id     name               ssn            License_id      age	height	eye_color    hair_color  gender	  plate_number	car_make   car_model
+    99716   Miranda Priestly     987756388       202298 	68	66	green	        red	 female	   500123	 Tesla	    Model S
+    90700   Regina George        337169072       291182         65	66	blue	        red	 female	   08CM64 	 Tesla	    Model S
+    78881   Red Korb             961388910       918773	        48	65	black	        red	 female	   917UU3	 Tesla	    Model S
+
+
+
+8) check income table with ssn
+    SELECT * FROM income WHERE ssn = 987756388;
+
+     ssn	  annual_income   name 
+     987756388	  310000          Marinda Priestly        -->     its income is greater
+     961388910	  278000          Red Korb
+
+
+9) Now check  facebook_event_checkin
+
+
+      SELECT  person_id, COUNT(*)
+           FROM facebook_event_checkin
+           WHERE event_name = 'SQL Symphony Concert'
+	   AND date LIKE '201712%'
+	   GROUP BY person_id
+	   HAVING COUNT(*) = 3;
+   
+       person_id	COUNT(*)          name
+         24556	           3          =  
+         99716	           3          = 
+
+       
+      SELECT * FROM person WHERE id= 99716;     --->            id	name	              license_id	address_number	address_street_name	ssn
+                                                              99716	Miranda Priestly	202298    	1883	            Golden Ave	       987756388
+10)  Check with answer query as name =  Miranda Priestly
+
+     Congrats, you found the brains behind the murder! Everyone in SQL City hails you as the greatest SQL detective of all time. Time to break out the champagne!
+
+
+11) NOW, time to get answer in 2 to 3 query using joins.
+
+             Query 1) Find the murderer — Jeremy Bowers
+
+              ------>    SELECT p.name AS murderer
+                            FROM person p
+                            JOIN get_fit_now_member gfm 
+                            ON p.id = gfm.person_id
+                            JOIN drivers_license dl 
+                            ON p.license_id = dl.id
+                            WHERE gfm.id LIKE '48Z%'
+                            AND gfm.membership_status = 'gold'
+                            AND dl.plate_number LIKE '%H42W%';
+
+
+             Query 2)  Find the mastermind — Miranda Priestly
+                               
+              ----->             SELECT p.name AS mastermind
+                                     FROM person p
+                                     JOIN drivers_license dl 
+                                     ON p.license_id = dl.id
+                                     JOIN income i 
+                                     ON p.ssn = i.ssn
+                                     JOIN facebook_event_checkin f
+                                     ON p.id = f.person_id
+                                     WHERE dl.hair_color = 'red'
+                                     AND dl.gender = 'female'
+                                     AND dl.car_make = 'Tesla'
+                                     AND dl.car_model = 'Model S'
+                                     AND f.event_name = 'SQL Symphony Concert'
+                                     AND f.date LIKE '201712%'
+                                     GROUP BY p.id, p.name
+                                     HAVING COUNT(*) = 3
+                                     ORDER BY i.annual_income DESC
+                                     LIMIT 1;  
+
+
+
+       
+
+
+
+
+

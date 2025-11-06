@@ -1,0 +1,269 @@
+******************************************************** IT Shaala *********************************************************
+
+              ------------------------------------ SQL Test1 Answer Sheet ---------------------------------------
+
+
+              %%%%%   SECTION A – SQL Fundamentals   %%%%%
+
+
+ Q.1. difference between DDL, DML, and DCL commands with 2 example of each.
+
+==>   In SQL, commands are used to manage data and database structure and divided into categories based on what they do. The main three types are DDL, DML, and DCL.
+
+   a) DDL(Data Defination Language): DDL is used to define and modify the structure of database objects such as tables, schemas, and indexes.
+       - It includes commands like CREATE, ALTER, DROP, TRUNCATE, and RENAME  
+       - We cannot rolled back DDL operations.
+                                
+     
+       ex. CREATE TABLE employees(
+           id INT PRIMARY KEY
+           name VARCHAR(50) NOT NULL
+           );
+
+           DROP TABLE employees;
+ 
+     b) DML (Data Manipulation Language): is used to manage and manipulate the data stored in database tables.
+          - It allows us to perform CRUD operations — Create, Read, Update, and Delete.
+          - DML includes commands like INSERT, UPDATE, DELETE, and SELECT.
+          - We can roll back DML operations using the ROLLBACK command.
+
+        ex. INSERT INTO employees(id, name, salary)
+                VALUES
+                  (1, 'Vaishnavi', 74000),
+                  (2, 'Gayatri', 87000),
+                  (3, 'Jay', 65000);
+
+             SELECT * FROM employees;
+
+     c) DCL (Data Control Language): is used to control access and permissions on database objects.     
+          - GRANT – Used to give specific privileges or permissions to users.
+          - REVOKE – Used to remove the privileges that were granted earlier.
+                   - We cannot roll back DCL operations. 
+
+        ex. GRANT SELECT ON employees TO employee1;
+            
+            REVOKE SELECT ON students FROM user1;
+
+
+Q. 2. Create a table students with the following fields:
+       id(integer, primary key)
+       name(varchar 50)
+       age(integer)
+       city(varchar 30)
+     Write SQL queries to:
+        a) Insert 3 records
+        b) Display all records
+==>  
+      CREATE TABLE students(
+          id INT PRIMARY KEY,
+          name VARCHAR(50),
+          age INT,
+          city VARCHAR(30)
+         );
+
+       a) => INSERT INTO students(id, name, age, city)
+               VALUES 
+                   (1, 'Anushka', 22, 'Nagpur'),
+                   (2, 'Tejas', 20, 'Katol'),
+                   (3, 'Kunal', 22, 'Nagpur');
+
+       b) => SELECT * FROM students;
+
+
+Q.3. Explain the use of constraints in SQL. Write a CREATE TABLE statement using PRIMARY KEY, NOT NULL, and UNIQUE constraints.
+
+==> Constraints in SQL are rules applied to table columns to ensure data integrity, accuracy, and reliability of the data stored in a database. 
+
+    a) PRIMARY KEY :  multiple columns primary key called composite key.
+           * Uniquely identifies each record in a table.
+           * It cannot contain NULL values and must be unique for each row.
+
+    b) NOT NULL :
+           * Ensures that a column cannot have a NULL value. 
+           * This means every record must have a value for that column.
+     
+    c) UNIQUE :
+           * Ensures that all the values in a column are different (no duplicates).
+           * Unlike PRIMARY KEY, a table can have multiple UNIQUE constraints.
+    
+ 
+          
+          %%%%%  SECTION B – Data Retrieval & Conditions  %%%%%%  
+
+
+Q. 1. Write queries for the following on employees(id, name, department, salary):
+         a. Display all employees whose salary is greater than 40,000.
+         b. Display all employees from the “Sales” department.
+         c. Sort employees by salary in descending order.
+==>  
+      a) => SELECT * FROM employees WHERE salary > 40000;
+      b) => SELECT * FROM employees WHERE department = 'Sales';
+      c) => SELECT * FROM employees 
+              ORDER BY salary DESC;
+
+    
+Q. 2. What is the difference between WHERE and HAVING clauses? Give one example of each.
+==> 
+        a) WHERE Clause:
+              - The WHERE clause is used to apply conditions on tale columns to filter records.
+              - It can be used with SELECT, UPDATE, and DELETE statements.
+              - The WHERE clause cannot be used with aggregate functions like SUM(), AVG(), etc. 
+             ex. SELECT * FROM employees
+                    WHERE city = 'Nagpur';
+
+        
+         b) HAVING Clause:
+               - The HAVING clause is used with GROUP BY to filter records after grouping.
+               - It is used with aggregate functions such as SUM(), AVG(), MIN(), MAX(), and COUNT().
+             ex. SELECT dept_id, MAX(salary)
+                  FROM employees
+                  GROUP BY dept_id
+                  HAVING max(salary) > 100000;
+
+Q. 3. Write queries to:
+        a) Find employees whose name starts with the letter 'A'.
+        b) Find employees whose salary is between 30,000 and 70,000.
+==>
+        a) => SELECT * FROM employees WHERE name LIKE 'A%';
+        b) => SELECT * FROM employees WHERE salary BETWEEN 30000 AND 70000;
+
+
+
+Q. 4. Write a query to find the average salary of each department from the employees table.          
+==>    
+        SELECT dept_id, AVG(salary)
+          FROM employees 
+          GROUP BY dept_id;               
+
+
+  
+           %%%%%%   SECTION C – Joins & Subqueries   %%%%%%
+
+
+1. Explain INNER JOIN and LEFT JOIN with an example using the following tables:
+       students(id, name, course_id)
+       courses(course_id, course_name)
+==> 
+     a) INNER JOIN : The INNER JOIN is used to retrieve only those records that have matching values in both tables (i.e., the intersection of both tables).
+
+                   - If there’s no match between the tables, the rows are not included in the result.
+           
+        ex. SELECT s.id, s.name, c.course_id, c.course_name
+            FROM students s
+            INNER JOIN 
+                  courses c
+            ON s.corse_id = c.course_id;
+
+
+     b) LEFT JOIN : The LEFT JOIN returns all records from the left table (students) and the matching records from the right table (courses).
+
+                   - If there is no match, the result will still include the left table record, but with NULL values for the right table columns.
+
+        ex. SELECT s.id, s.name, c.course_id, c.course_name
+            FROM students s
+            INNER JOIN 
+                  courses c
+            ON s.corse_id = c.course_id;
+
+
+
+2. Write a query to find students who have enrolled in a course whose name starts
+with the letter 'D'. Use a subquery or JOIN as appropriate.
+
+==> SELECT * FROM courses WHERE course_name LIKE 'D%';
+ 
+    SELECT * 
+     FROM students
+     WHERE course_id IN(
+          SELECT course_id 
+          FROM courses 
+          WHERE course_name LIKE 'D%');
+    OR
+
+    SELECT s.*
+      FROM students s
+      LEFT JOIN 
+           courses c
+      ON s.course_id = c.course_id
+      WHERE c.course_name LIKE 'D%';
+          
+
+
+3. Write a query to display each student's name along with their course name using JOIN.
+
+    SELECT s.id, s.name, c.course_id, c.course_name
+     FROM students s
+     LEFT JOIN 
+          courses c
+     ON s.course_id = c.course_id; 
+
+
+             %%%%%  SECTION D – Database Design  %%%%%
+
+
+
+Q. 1. Design a simple database schema for a Library System including:
+Books
+Members
+Borrow Records
+Mention keys and relationships.
+            
+==>            
+  a) Books => CREATE TABLE books(
+                book_id INT PRIMARY KEY,
+                book_name VARCHAR(50),
+                book_price DECIMAL(10,2)
+              );
+
+  b) Members => CREATE TABLE members(
+                  m_id INT PRIMARY KEY,
+                  m_name VARCHAR(50),
+                  m_address VARCHAR(100)
+                );
+
+  c) Borrow  =>  CREATE TABLE borrow_records(          
+     Records       b_id INT PRIMARY KEY,
+                   b_date DATE DEFAULT CURRENT_DATE,
+                   book_id INT,
+                   m_id,
+                   FOREIGN KEY (book_id) REFERENCE books(bbook_id),
+                   FOREIGN KEY (m_id) REFERENCE members(m_id)
+                 );
+             
+        
+
+2. Write SQL queries to create a table orders with the following structure:
+
+order_id(Primary Key, Integer)
+customer_name (Varchar 50)
+order_date (Date)
+amount (Decimal)Then, write queries to:
+a. Insert 2 sample records
+b. Display all orders placed in the current month
+
+==>
+        CREATE TABLE orders(
+           order_id INT PRIMARY KEY,
+           customer_name VARCHAR(50),
+           order_date DATE DEFAULT CURRENT_DATE,
+           amount DECIMAL(10,2)
+        );
+
+     
+     a) =>   INSERT INTO orders(order_id, customer_name, order_date, amount)
+              VALUES
+                (101, 'Kartik', '2-11-2025', 35000.00),
+                (102, 'Divyakshi', '3-11-2025', 50000.00);
+   
+  
+     b) =>   SELECT * FROM orders
+                WHERE order_date BETWEEN '2025-11-02' AND '2025-11-02';
+
+              OR
+                    SELECT * FROM orders
+                      WHERE MONTH(order_date) = MONTH(CURRENT_DATE())
+                          AND YEAR(order_date) = YEAR(CURRENT_DATE());
+
+
+
+--------------------------------------------------------------------------------------------------- ****** --------------------------------------------------------------------------------

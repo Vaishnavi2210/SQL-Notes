@@ -1,0 +1,244 @@
+******************** SQL Test  **************************
+
+-------- SECTION A ----------
+
+Q1. Difference between DDL, DML, DCL commands with example.
+
+=> In SQL, DDL, DML, and DCL are commands used to manage, database Operations with their objects.
+    * DDL - DDL is (DATA Defination language) it used to define and modify the structure of database objects.
+          - its used to CREATE, ALTER, DROP, TRUNCATE and RENAME data
+          - it is used to define structure. we cannot rollback it.
+              
+         EX. CREATE TABLE Student(
+                 id INT PRIMARY KEY,
+                 name VARCHAR(50) NOL NULL
+                );
+        
+             
+             DROP TABLE  Student;
+
+      DML - DML is (Data Manipulation language) used to manage and manipulate data.
+          - we can perform CRUD operation using DML commands.
+          - it Used to INSERT, UPDATE, DELETE and Retrive(SELECT) data from table.
+          - we can rollback it.  
+          
+
+          EX. INSERT INTO student(id, name)
+                   VALUES
+                      (1, 'Vaishnavi'),
+                      (2, 'Gayatri');
+              SELECT * FROM students;
+
+      DCL - DCL ( Data control language) used to control data.
+             - GRANT - used to GRANT the changes(saves)
+             - REVOKE - used to remove GRANT (unsave).
+
+Q.2 Create table students
+
+=>      CREATE TABLE students( 
+             id INT PRIMARY KEY,
+             name VARCHAR(50),
+             age INT,
+             city VARCHAR(30),
+             );
+
+    SQL Query -
+                 1) insert 3 records
+                   
+                     INSERT INTO students(id, name, age, city)
+                           VALUES
+                             (1, 'ABC', 25, 'Pune'),
+                             (2, 'DEF', 26, 'Nagpur'),
+                             (3, 'XYZ', 24, 'Mumbai');
+
+                 2) SELECT * FROM students;
+
+
+---------------- SECTION B --------------------------------------------
+
+Q.1  employees(id, name, department, salary)
+  
+=>     a) SELECT * FROM employees WHERE salary > 40000;
+
+       b) SELECT * FROM employees WHERE department = 'Sales';
+
+       c) SELECT * FROM employees ORDER By salary DESC;
+
+Q.2 Difference Between HAVING and WHERE
+
+=>   a)  WHERE - is clause used to applied rules on table column. we used WHERE for retrieve, delete, and update records using condition.
+           -  WHERE is not used with Aggregate functions.
+          
+           EX. SELECT * FROM employees
+                   WHERE city = 'Nagpur';
+ 
+     b)  HAVING - is also clause used with GROUP BY always and perform aggregate functions.
+            - used with aggregate function (SUM(), AVG(), MIN(), MAX(), COUNT())
+
+          EX. SELECT department_id, MAX(salary)
+              FROM employees
+              GROUP BY department_id
+              HAVING salary MAX(salary) > 100000;
+
+
+Q.3 Write Query
+
+=>   a) SELECT * FROM employees 
+             WHERE name LIKE 'A%';
+
+     b) SELECT * FROM employees
+             WHERE salary BETWEEN(30000 AND 70000);
+
+
+Q.4
+
+
+--------------- SECTION C --------------------------------
+
+Q.1  Explain INNER JOIN and LEFT JOIN
+         
+       students(id, name, course_id);
+       courses(course_id, course_name);
+      
+=>   a) INNER JOIN - INNER JOIN is used to retrieve matching records from both table.
+          
+          SELECT s.id, c.course_id
+             FROM 
+                students s
+             INNER JOIN
+                courses c
+             ON s.course_id = c.course_id
+             GROUP BY s.id, c.course_id;
+
+
+     b) LEFT JOIN - LEFT JOIN is used to retrieve all records from left table and matching records from right table.
+
+           
+       SELECT  s.id, s.name, c.course_id
+             FROM 
+                students s
+             LEFT JOIN
+                courses c
+             ON s.course_id = c.course_id;
+             GROUP BY s.id, s.name, c.course_id;
+
+
+      
+Q.3  SELECT  s.id, s.name, c.course_id, c.course_name
+        FROM
+           students s
+        INNER JOIN
+           courses c
+        ON s.course_id = c.course_id
+        GROUP BY s.id, s.name, c.course_id, c.course_name;
+
+
+
+---------------------------- SECTION D ------------------------------
+
+
+Q.2  Write Query
+=>
+        CREATE TABLE orders(
+            order_id INT PRIMARY KEY,
+            customer_name VARCHAR(50),
+            order_date DATE DEFAULT CURRENT_DATE,
+            amount DECIMAL (0, 0) 
+         );
+          
+
+        a) INSERT INTO orders(order_id, customer_name, order_date, amount)
+                 VALUES
+                   (1, 'Jaydeep', '1-11-2025', 12000 ),
+                   (2, 'Kartik', '1-11-2025', 15000 );
+                   
+
+
+       b) SELECT * FROM orders
+                 WHERE  order_date BETWEEN ('1-11-2025' AND '30-11-2025');
+
+
+
+
+Q.1 -- image given below.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+             
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+           
